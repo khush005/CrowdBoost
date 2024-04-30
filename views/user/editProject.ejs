@@ -1,0 +1,57 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/auth.css" />
+<link rel="stylesheet" href="/css/forms.css" />
+<body>
+  <%- include('../includes/userNavbar.ejs') %>
+  <h1>UpdateProject</h1>
+  <main>
+    <form
+      class="login-form"
+      action="/updateProject/<%= project._id %>"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <div class="form-control">
+        <label for="title">Title</label>
+        <input
+          type="text"
+          name="title"
+          id="title"
+          value="<%= project.title %>"
+        />
+      </div>
+      <div class="form-control">
+        <label for="description">Description</label>
+        <input
+          type="text"
+          name="description"
+          id="description"
+          value="<%= project.description %>"
+        ></input>
+      </div>
+      <div class="form-control">
+        <label for="target_amount">Target Amount</label>
+        <input
+          type="text"
+          name="target_amount"
+          id="target_amount"
+          value="<%= project.target_amount %>"
+        />
+      </div>
+      <div class="form-control">
+        <!-- Display current project image if available -->
+        <% if (project.avatar) { %>
+          <img
+            src="data:image/png;base64,<%= project.avatar %>"
+            alt="Current cover image"
+            style="max-width: 100%; height: auto;"  
+          />
+        <% } %>
+        <label for="avatar">Upload New Cover Page</label>
+        <input type="file" name="avatar" id="avatar" accept="image/*" />  <!-- Added accept attribute -->
+      </div>
+      <button class="btn" type="submit">Update Project</button>
+    </form>
+  </main>
+  <%- include('../includes/end.ejs') %>
+</body>

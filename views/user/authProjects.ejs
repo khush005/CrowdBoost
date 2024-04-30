@@ -1,0 +1,75 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="css/creators.css" />
+<link rel="stylesheet" href="css/forms.css">
+<script>
+  document.querySelector("form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    const form = event.target;
+    const data = new FormData(form);
+    fetch(form.action, {
+      method: "post",
+      body: data,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("Funds added successfully!");
+          window.location.reload(); // Optionally reload or directly update the DOM
+        } else {
+          alert("Error adding funds");
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  });
+</script>
+<body>
+  <%- include('../includes/userNavbar.ejs') %>
+
+  <main>
+    <% if (projects.length > 0) { %>
+    <div class="grid">
+      <% for (let project of projects) { %>
+      <article class="card product-item">
+        <header class="card__header">
+          
+          <h1 class="product__title"><%= project.title %></h1>
+        </header>
+
+        <div class="card__content">
+          <h2 class="creators__pageName">
+            Target Amount: <%= project.target_amount %> Raised Amount: <%=
+            project.current_amount %>
+          </h2>
+          <p class="product__description"><%= project.description %></p>
+
+          <div class="card__image">
+          <img
+            src="data:image/png;base64,<%= project.avatar %>"
+            alt="<%= project.title %>"
+          />
+        </div>
+
+          <form action="/projects/raiseFunds/<%= project._id %>" method="post" class="form-control card__actions">
+            <!-- <input type="text" name="username" placeholder="username"> -->
+            <!-- <input type="text" name="userEmail" placeholder="userEmail"> -->
+            <input type="number" name="current_amount" placeholder="Amount" />
+            <!-- <div class="card__actions"> -->
+              <button class="btn" style="margin-top: 15px;">Pledge</button>
+            <!-- </div> -->
+          </form>
+
+          <!-- <div class="card__actions"> -->
+            <a href="/getProjectById/<%= project._id %>" class="btn" style="margin-top: 15px;">Details</a>
+            <!-- <a href="/getPayment" class="btn">Donate Now</a> -->
+          <!-- </div> -->
+
+        </div>
+      </article>
+      <% } %>
+    </div>
+    <% } else { %>
+    <h1>No Creators Found!</h1>
+    <% } %>
+  </main>
+  <%- include('../includes/end.ejs') %>
+</body>

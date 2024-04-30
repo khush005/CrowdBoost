@@ -1,0 +1,33 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="css/creators.css" />
+<link rel="stylesheet" href="css/forms.css" />
+<body>
+  <%- include('../includes/userNavbar.ejs') %>
+  <main class="centered" style="text-align: left; padding: 40px 40px;">
+    <div class="profile" style="padding: 20px 20px;">
+    <span class="label">FullName:</span>
+    <span class="name"><%= user.firstName %> <%= user.lastName %></span>
+  </div>
+
+  <div class="profile" style="padding: 20px 20px;">
+    <span class="label">PageName:</span>
+    <span class="name"><%= user.pageName %> </span>
+  </div>
+
+  <div class="profile" style="padding: 20px 20px;">
+    <span class="label">Category:</span>
+    <span class="name"><%= user.category %></span>
+  </div>
+
+  <div class="profile" style="padding: 20px 20px;">
+    <span class="label">Email:</span>
+    <span class="name"><%= user.email %></span>
+  </div>
+  <div style="padding: 20px 20px;">
+    <button class="btn">
+      <a href="/editProfile/<%= user._id %>" style="color: inherit; text-decoration: none">Edit</a>
+    </button>
+  </div>
+  </main>
+  <%- include('../includes/end.ejs') %>
+</body>

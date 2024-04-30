@@ -1,0 +1,43 @@
+.product-form {
+    width: 20rem;
+    max-width: 90%;
+    margin: auto;
+    display: block;
+}
+
+.product-item {
+    width: 20rem;
+    max-width: 95%;
+    margin: 1rem;
+}
+
+.product__title {
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.creators__pageName {
+    text-align: center;
+    color: #4d4d4d;
+    margin-bottom: 0.5rem;
+}
+
+.product__description {
+    text-align: center;
+}
+
+
+.profile {
+    font-size: 20px; /* Sets a base font size */
+    display: flex; /* Using flexbox to align items in a row */
+    align-items: baseline; /* Aligns items by their baseline for a clean look */
+}
+
+.profile .label {
+    font-weight: bold; /* Makes the label bold */
+    margin-right: 10px; /* Adds space between the label and the name */
+}
+
+.profile .name {
+    font-weight: normal; /* Optional: explicitly sets the name's font weight */
+}

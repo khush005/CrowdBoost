@@ -1,0 +1,58 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="css/table.css" />
+<body>
+  <%- include('../includes/userNavbar.ejs') %> 
+    <h1>User Donations</h1>
+    <% if (user.donations && user.donations.length > 0) { %>
+        <div class="container">
+            <ul class="responsive-table">
+                <li class="table-header">
+                    <div class="col col-1">Project Title</div>
+                    <div class="col col-2">Amount Donated</div>
+                    <div class="col col-3">Date</div>
+                    <div class="col col-4">Donate More</div>
+                    <div class="col col-5">Remove Donation</div>
+                    <div class="col col-6">Payment Statud</div>
+                </li>
+                <% user.donations.forEach(function(donation) { %>
+                    <li class="table-row">
+                    <!-- <h1><%= donation.paymentStatus %></h1> -->
+                    <div class="col col-1"><%= donation.project.title %></div>
+                    <div class="col col-2"><%= donation.amountDonated %></div> 
+                    <div class="col col-3"><%= new Date(donation.dateDonated).toLocaleDateString() %></div> 
+                    <div class="col col-4">
+                        <% if(!donation.paymentStatus || donation.paymentStatus !== 'paid') { %>
+                            <button class="btn" >
+                            <a href="/editDonation/<%= donation._id %>" style="color: inherit; text-decoration: none">Edit</a>
+                        <% } %>
+                    
+                    </button></div>
+
+                    <div class="col col-5">
+                        <% if(!donation.paymentStatus || donation.paymentStatus !== 'paid') { %>
+                            <button class="btn">
+                            <a href="/deleteDonation/<%= donation._id %>" style="color: inherit; text-decoration: none" >Delete</a>
+                            </button>
+                        <% } %>    
+                    </div>
+
+                    <div class="col col-6">
+                        <% if (donation.paymentStatus === 'paid') { %>
+                            <span>Payment Done</span>
+                        <% } else { %>
+                            <button class="btn">
+                            <a href="/getPayment/<%= donation._id %>" style="color: inherit; text-decoration: none">Donate Now</a>
+                            </button>
+                        <% } %>
+                    </div>
+
+                </li>
+            <% }); %>
+        </ul>
+        </div>
+    <% } else { %>
+        <h1 style="color: white; margin-top: 25px; margin-left: 40px; ">No Donations Found.</h1>
+    <% } %>
+</body>
+<%- include('../includes/end.ejs') %>
+</body>

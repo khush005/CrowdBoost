@@ -1,0 +1,65 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/auth.css" />
+<link rel="stylesheet" href="/css/forms.css" />
+<body>
+  <%- include('../includes/userNavbar.ejs') %>
+  <h1>Update Profile</h1>
+  <main>
+    <form
+      class="login-form"
+      action="/updateProfile/<%= user._id %>"
+      method="post"
+    >
+      <div class="form-control">
+        <label for="firstName">FirstName</label>
+        <input
+          type="text"
+          name="firstName"
+          id="firstName"
+          value="<%= user.firstName %>"
+        />
+      </div>
+      <div class="form-control">
+        <label for="lastName">lastName</label>
+        <input
+          type="text"
+          name="lastName"
+          id="lastName"
+          value="<%= user.lastName %>"
+        ></input>
+      </div>
+      <div class="form-control">
+        <label for="pageName">Page Name</label>
+        <input
+          type="text"
+          name="pageName"
+          id="pageName"
+          value="<%= user.pageName %>"
+        />
+      </div>
+
+      <div class="form-control">
+        <label for="category">Category</label>
+        <input
+          type="text"
+          name="category"
+          id="category"
+          value="<%= user.category %>"
+        />
+      </div>
+
+      <div class="form-control">
+        <label for="email">Email</label>
+        <input
+          type="text"
+          name="email"
+          id="email"
+          value="<%= user.email %>"
+        />
+      </div>
+      
+      <button class="btn" type="submit">Update Profile</button>
+    </form>
+  </main>
+  <%- include('../includes/end.ejs') %>
+</body>

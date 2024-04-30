@@ -1,0 +1,59 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="css/table.css">
+<body>
+  <%- include('../includes/userNavbar.ejs') %>
+  <h1>Projects Funded</h1>
+  <main>
+    
+    <% if (projectsFunded.length > 0) { %>
+    <!-- <div class="grid"> -->
+        <div class="container">
+            <ul class="responsive-table">
+                <li class="table-header">
+                <div class="col col-1">Title</div>
+                <div class="col col-2">Description</div>
+                <div class="col col-3">Target Amount</div>
+                <div class="col col-4">Amount Raised</div>
+            </li>
+      <% for (let project of projectsFunded) { %>
+            
+            <li class="table-row">
+              <div class="col col-1" ><%= project.title %></div>
+              <div class="col col-2" ><%= project.description %></div>
+              <div class="col col-3" ><%= project.target_amount %></div>
+              <div class="col col-4"><%= project.current_amount %></div>
+              
+            </li>
+            <% } %>
+        </ul>
+    </div>
+    <!-- </div> -->
+    <% } else { %>
+    <h1 style="color: white; margin-top: 25px; margin-left: 40px; ">No Funded Projects Found!</h1>
+    <% } %>
+  </main>
+
+  <%- include('../includes/end.ejs') %>
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

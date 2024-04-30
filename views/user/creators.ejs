@@ -1,0 +1,38 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/creators.css" />
+<body>
+  <%- include('../includes/navigation.ejs') %>
+
+  <main>
+    <% if (creators.length > 0) { %>
+    <div class="grid">
+      <% for (let creator of creators) { %>
+      <article class="card product-item">
+        <header class="card__header">
+          <h1 class="product__title">
+            <%= creator.firstName %> <%= creator.lastName %>
+          </h1>
+        </header>
+        <div class="card__image">
+          <img
+            src="data:image/png;base64,<%= creator.avatar %>"
+            alt="<%= creator.firstName %>"
+          />
+        </div>
+
+        <div class="card__content">
+          <h2 class="creators__pageName"><%= creator.pageName %></h2>
+          <p class="product__description"><%= creator.category %></p>
+        </div>
+        <div class="card__actions">
+          <a href="/getAllProjects" class="btn">Interested</a>
+        </div>
+      </article>
+      <% } %>
+    </div>
+    <% } else { %>
+    <h1 style="color: white;">No Creators Found!</h1>
+    <% } %>
+  </main>
+  <%- include('../includes/end.ejs') %>
+</body>

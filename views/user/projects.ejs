@@ -1,0 +1,51 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="css/creators.css" />
+<link rel="stylesheet" href="css/forms.css">
+<body>
+  <%- include('../includes/navigation.ejs') %>
+
+  <main>
+    <% if (projects.length > 0) { %>
+    <div class="grid">
+      <% for (let project of projects) { %>
+      <article class="card product-item">
+        <header class="card__header">
+          <!-- <h1>Project Card</h1> -->
+          <!-- <h1>Title:</h1> -->
+          <h1 class="product__title"><%= project.title %></h1>
+        </header>
+
+        <div class="card__content">
+          <!-- <h2>Description: </h2> -->
+          <h2 class="creators__pageName">
+            Target Amount: <%= project.target_amount %> Raised Amount: <%=
+            project.current_amount %>
+          </h2>
+          <p class="product__description"><%= project.description %></p>
+          <div class="card__image">
+          <img
+            src="data:image/png;base64,<%= project.avatar %>"
+            alt="<%= project.title %>"
+          />
+        </div>
+          <!-- <form action="/projects/raiseFunds/<%= project._id %>" method="post">
+            <input type="number" name="current_amount" placeholder="Amount" />
+            <button class="btn">Pledge</button>
+          </form> -->
+
+          <div class="card__actions">
+            <a href="/getProjectById/<%= project._id %>" class="btn">Details</a>
+            <!-- <%- include('../includes/addToDonate.ejs', {project: project}) %> -->
+            <a href="/login" class="btn">Donate Now</a>
+          </div>
+
+        </div>
+      </article>
+      <% } %>
+    </div>
+    <% } else { %>
+    <h1 style="color: white;">No Creators Found!</h1>
+    <% } %>
+  </main>
+  <%- include('../includes/end.ejs') %>
+</body>

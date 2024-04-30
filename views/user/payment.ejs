@@ -1,0 +1,31 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/auth.css" />
+<link rel="stylesheet" href="/css/forms.css" />
+<link rel="stylesheet" href="/css/cart.css">
+<body>
+  <%- include('../includes/userNavbar.ejs') %>
+  <h1>Payment</h1>
+  <main>
+    <ul class="cart__item-list">
+        <li class="cart__item">
+            <h1><%= donation.project.title %></h1>
+            <h2><%= donation.amountDonated %></h2>
+            <h2><%= donation.dateDonated.toLocaleDateString() %></h2>
+        </li>
+    </ul>
+    <div class="centered">
+        <button class="btn" id="donate-btn" style="margin-right: 726px; margin-top: 21px;">Donate</button>
+        <script src="https://js.stripe.com/v3/"></script>
+        <script>
+            var stripe = Stripe('pk_test_51P9kUeSJ7LaoK15jrJkXtRND7kVLopwkvmn5SjKopdqKuQCPl3ztgwluaHkswNiNz5WrUG4VDu8Uz6ih9dxm3RlZ00zgZIINiy')
+            var donateBtn = document.getElementById('donate-btn')
+            donateBtn.addEventListener('click', function() {
+                stripe.redirectToCheckout({
+                    sessionId: '<%= sessionId %>'
+                })
+            })
+        </script>
+    </div>
+  </main>
+  <%- include('../includes/end.ejs') %>
+</body>
