@@ -1,0 +1,44 @@
+The hash values for the `STORED HASH` and the `INPUT HASH` you are generating are not supposed to be the same, and this is actually a fundamental aspect of how bcrypt works. Each time you hash a password with bcrypt, even with the same input, the result will be a different hash due to the incorporation of a random salt during the hashing process.
+
+### Understanding Bcrypt
+Bcrypt is designed to automatically generate a new salt for each hashing operation. Therefore, two hashes of the same password will not match because they will have different salts. The strength of bcrypt lies in this feature, as it helps protect against rainbow table attacks.
+
+### Correct Way to Verify Passwords
+To verify a password, you should use the `bcrypt.compare` function. This function takes the plaintext password and the stored hash as inputs and internally manages the salt to check if the input password, when hashed, matches the stored hash. Here's the correct way to verify passwords with bcrypt:
+
+```javascript
+const isMatch = await bcrypt.compare(req.body.password, user.password);
+if (!isMatch) {
+    return res.status(400).send("Incorrect password");
+}
+```
+
+### Debugging the Login Issue
+Since you're facing a "not matching password" error, let's ensure everything is set up correctly:
+
+1. **Verify Hashing on Registration or Password Reset**:
+   Make sure when you set or reset a user's password, you are using bcrypt to hash the password before storing it. For example:
+
+   ```javascript
+   const hashedPassword = await bcrypt.hash(req.body.password, 10); // ensure using the same salt rounds everywhere
+   user.password = hashedPassword;
+   await user.save();
+   ```
+
+2. **Ensure Correct Use of `bcrypt.compare`**:
+   Confirm that you are using `bcrypt.compare` to check if the entered password is correct. This method understands how to properly compare the plaintext password against the hashed version.
+
+3. **Check for Implementation Errors**:
+   Make sure that there is no modification or trimming of the password data that could alter the input before it reaches your hashing or comparison logic.
+
+4. **Consistency in Salt Rounds**:
+   Ensure that you are using the same salt rounds (e.g., `10` in `bcrypt.hash(req.body.password, 10)`) during both the creation and verification of passwords.
+
+5. **Log and Check Input**:
+   Verify that what the user inputs is what your application receives. Sometimes, middleware or erroneous handling might alter the data:
+
+   ```javascript
+   console.log('Password from form:', req.body.password);
+   ```
+
+If all these steps are correctly implemented and the issue persists, you may need to re-examine other parts of your user management flow or database integrity. Re-testing the entire user registration and login process with new users could also help isolate the problem.

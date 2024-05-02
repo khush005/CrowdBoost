@@ -1,6 +1,6 @@
+const crypto = require("crypto");
 const bcrypt = require('bcryptjs')
 const User = require('../models/user');
-const Project = require('../models/project');
 const sharp = require('sharp')
 const nodemailer = require('nodemailer')
 require('dotenv').config()
@@ -114,152 +114,133 @@ exports.postSignup = async (req, res) => {
 
 exports.postLogin = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-
-    // Attempt to find the user by email
-    const user = await User.findOne({ email });
+    // Fetch the user by email
+    const user = await User.findOne({ email: req.body.email.trim() });
     if (!user) {
       return res.status(401).send("Login failed: User not found"); // 401 Unauthorized
     }
+    console.log("STORED HASH-----------------", user.password);
+
+    // No need to hash input password here for logging; just compare
+    // const inputHash = await bcrypt.hash(req.body.password, 10);
+    // console.log('INPUT HASH------------------', inputHash);
 
     // Check if the password matches
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    console.log("ISMATCH---------------", isMatch);
     if (!isMatch) {
       return res.status(401).send("Login failed: Incorrect password"); // 401 Unauthorized
     }
-    
+
+    // Generate a token and store it in a cookie
     const token = await user.generateAuthToken();
-    console.log(`Token part: ${token}`)
+    console.log(`Token part: ${token}`);
 
     res.cookie("jwt", token, {
-      expires: new Date(Date.now() + 3600000),
-      httpOnly: true
-    })
-    console.log(`This is a cookie: ${req.cookies.jwt}`)
+      expires: new Date(Date.now() + 3600000), // Sets cookie to expire in 1 hour
+      httpOnly: true, // The cookie only accessible by the web server
+    });
 
-    if (isMatch) {
-      // res.status(201).render("auth/login")
-      res.redirect("/createProject")
-    }
-    else {
-      res.send("Password not Matching")
-    }
-
+    // Successful login redirects to createProject page
+    res.redirect("/createProject");
   } catch (e) {
-    res.status(400).send("Invalid Login Credentials")
-    console.log(e)
+    console.log(e);
+    res.status(400).send("Invalid Login Credentials");
   }
 };
 
-exports.getForgotPassword = async (req, res) => {
-  try {
-    res.render('auth/forgotPassword', {
-      path: '/forgot-password'
-    })
-  } catch (e) {
-    res.status(500).send('Internal server error')
-    console.log(e)
-  }
-}
+
+
+// Mailer configuration
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_TEST,
+    pass: process.env.EMAIL_PWD,
+  },
+});
+
+const sendResetPasswordMail = (req, email, token) => {
+  const resetUrl = `http://${req.headers.host}/reset-password/${token}`;
+  transporter.sendMail(
+    {
+      to: email,
+      from: process.env.EMAIL_USERNAME, // Ensure this environment variable is correctly set in your .env file
+      subject: "Password Reset",
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        ${resetUrl}\n\n
+        If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    },
+    (error, info) => {
+      if (error) {
+        console.log("Error sending email:", error);
+        return;
+      }
+      console.log("Email sent:", info.response);
+    }
+  );
+};
+
+
+
+exports.getForgotPassword = (req, res) => {
+  res.render("auth/forgot-password", { path: "/forgot-password" });
+};
 
 exports.postForgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).send( "No account with this email address exists.");
+      console.log("user does not exist");
     }
 
-    // USING CRYPTOGRAPHIC FUNCTIONS
-    // const token = crypto.randomBytes(20).toString('hex')
+    const resetPasswordToken = crypto.randomBytes(20).toString("hex");
+    user.resetPasswordToken = resetPasswordToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
+    sendResetPasswordMail(req, user.email, resetPasswordToken)
     
-    // USING JWT
-    /*
-    const token = JWT.sign(
-      {
-        _id: user._id.toString(),
-        exp: Math.floor(Date.now() / 1000) + 60 * 60,
-      },
-      process.env.JWT_SECRET
+    await user.save();
+    res.send(
+      "An e-mail has been sent to " + user.email + " with further instructions."
     );
-    */
-
-   // USING BCRYPT
-   const salt = await bcrypt.genSalt(10);
-   const token = await bcrypt.hash(user._id.toString() + Date.now().toString(), salt)  
-
-   user.resetPasswordToken = token;
-   user.resetPasswordExpires = Date.now() + 3600000;  // 1h
-
-   await user.save();
-
-  const transport = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp@gmail.com",
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_TEST,
-      pass: process.env.EMAIL_PWD,
-    },
-  });
-
-  await transport.sendMail({
-    from: process.env.EMAIL_TEST,
-    to: user.email,
-    subject: "Password reset",
-    html: `You are receiving this because you (or someone else) have requested the reset of the password for your        account.\n\n` +
-            `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
-            `http://${req.headers.host}/reset-password/${token}\n\n` +
-            `If you did not request this, please ignore this email and your password will remain unchanged.\n`
-  }); 
-
-  res.send(
-    "An e-mail has been sent to " + user.email + " with further instructions."
-  );
-
-  } catch (e) {
-    res.status(500).send("Error sending the email");
-    console.log(e);
+  } catch (error) {
+    res
+      .status(500)
+      .send("Error sending the password reset email. Try again later.");
   }
 };
 
-
 exports.getResetPassword = async (req, res) => {
-  try {
-    const user = await User.findOne({
-      resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() }
-    })
+  const token = req.params.token;
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
 
-    if (!user) {
-      return res
-        .status(404)
-        .send("Password reset token is invalid or has expired.");
-    }
-
-    res.render("auth/resetPassword", {
-      token: req.params.token,
-      path: '/reset-password'
-    })
-
-  } catch (e) {
-    res.status(500).send('Internal server error')
-    console.log(e)
+  if (!user) {
+    return res
+      .status(404)
+      .send("Password reset token is invalid or has expired.");
   }
-}
-
+  res.render("auth/reset-password", {
+    path: "/reset-password",
+    token
+  });
+};
 
 exports.postResetPassword = async (req, res) => {
   try {
+    const token = req.params.token;
+    const newPassword = req.body;
+
     const user = await User.findOne({
-      resetPasswordToken: req.params.token,
+      resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
     });
-    console.log('USER---------------', user)
-    console.log('TOKEN--------------------', req.params.token)
-    console.log('PASSWORD----------', req.body.password)
 
     if (!user) {
       return res
@@ -267,27 +248,20 @@ exports.postResetPassword = async (req, res) => {
         .send("Password reset token is invalid or has expired.");
     }
 
-    if(!req.body.password) {
-      return res.status(400).send('Password is required.')
-    }
+    // if (!req.body.password) {
+    //   return res.status(400).send("Password is required.");
+    // }
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10)
-
-    user.password = hashedPassword;
-    console.log('HASHED PASSWORD-----------------', user.password)
+    // const newPassword = await bcrypt.hash(req.body.password, 10);
+    // console.log('NEW------------------', newPassword.password)
+    user.password = newPassword.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
-    console.log('USER RESET------------------------------------------', user)
 
     await user.save();
 
-    // const isMatch = await bcrypt.compare(req.body.password, user.password);
-    // if (isMatch) {
-    //   res.send('Your Password has been updated');
-    // }
-
-  } catch (e) {
+    res.status(200).redirect('/login');
+  } catch (error) {
     res.status(500).send("Internal server error");
-    console.log(e);
   }
-}
+};

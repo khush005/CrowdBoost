@@ -1,3 +1,12 @@
 TEsting data: card details: 4000 0035 6000 0008
 expire date: 12/34 
 cvv: any 
+
+
+New Functionalitites can be added:
+- OTP 
+- Admin
+- If user gets deleted, its all projects should also get deleted
+- User can update status of active/inactive their posted projects
+- Authenticated user can change password
+- After user gets registered, he can only be logged in when admin activates his account.

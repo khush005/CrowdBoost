@@ -3,13 +3,13 @@
 <link rel="stylesheet" href="/css/forms.css" />
 <body>
   <%- include('../includes/userNavbar.ejs') %>
-  <h1>Update Profile</h1>
   <main>
     <form
-      class="login-form"
-      action="/updateProfile/<%= user._id %>"
-      method="post"
+    class="login-form"
+    action="/updateProfile/<%= user._id %>"
+    method="post"
     >
+    <h1>Update Profile</h1>
       <div class="form-control">
         <label for="firstName">FirstName</label>
         <input

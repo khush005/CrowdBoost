@@ -52,8 +52,6 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
-    resetPasswordToken: String,
-    resetPasswordExpires: Date,
     avatar: {
       type: Buffer,
     },
@@ -80,7 +78,15 @@ const userSchema = new mongoose.Schema(
           default: 'pending'
         }
       }
-    ]
+    ],
+    resetPasswordToken: {
+      type: String,
+      default: null
+    },
+    resetPasswordExpires: {
+      type: Date,
+      default: null
+    }
   },
   {
     timestamps: true,
@@ -110,16 +116,21 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
+    try {
+      const token = JWT.sign(
+        { _id: user._id.toString() },
+        process.env.JWT_SECRET,
+        { expiresIn: "8h" }
+      );
 
-    const token = JWT.sign(
-      { _id: user._id.toString()},
-      process.env.JWT_SECRET,
-      { expiresIn: "8h" }
-    );
-
-    user.tokens = user.tokens.concat({ token })
-    await user.save();
-    return token;
+      user.tokens = user.tokens.concat({ token });
+      await user.save();
+      return token;
+    } catch (error) {
+      // Handle possible saving errors
+      console.error("Error generating auth token:", error);
+      throw error;
+    }
 }
 
 userSchema.methods.addDonation = async function (projectId, amount) {

@@ -3,14 +3,14 @@
 <link rel="stylesheet" href="/css/forms.css" />
 <body>
   <%- include('../includes/userNavbar.ejs') %>
-  <h1>UpdateProject</h1>
   <main>
     <form
-      class="login-form"
-      action="/updateProject/<%= project._id %>"
-      method="post"
-      enctype="multipart/form-data"
+    class="login-form"
+    action="/updateProject/<%= project._id %>"
+    method="post"
+    enctype="multipart/form-data"
     >
+    <h1>UpdateProject</h1>
       <div class="form-control">
         <label for="title">Title</label>
         <input

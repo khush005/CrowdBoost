@@ -2,7 +2,6 @@ const { configDotenv } = require("dotenv");
 const Project = require("../models/project");
 const JWT = require("jsonwebtoken");
 const sharp = require("sharp");
-const Donation = require("../models/donation");
 const User = require("../models/user");
 const { default: mongoose } = require("mongoose");
 require("dotenv").config();

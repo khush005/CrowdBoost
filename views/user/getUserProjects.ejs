@@ -3,8 +3,8 @@
 <link rel="stylesheet" href="css/forms.css" />
 <body>
   <%- include('../includes/userNavbar.ejs') %>
-  <h1>View Projects</h1>
   <main>
+    <h1 style="color: white; text-align: center;">View Projects</h1>
     <% if (userProjects.length > 0) { %>
     <div class="grid">
       <% for (let project of userProjects) { %>
