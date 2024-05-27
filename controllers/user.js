@@ -187,7 +187,7 @@ exports.deleteDonation = async (req, res) => {
       res.status(404).send("Donation not found");
     }
     donation.deleteOne();
-    await user.save();
+    // await user.save();
     // const delete_donation = delete user.donations[donationId]
     // console.log("DELETE------------------", delete_donation)
 

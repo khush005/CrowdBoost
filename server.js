@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const helmet = require('helmet');
+const rateLimit = require("express-rate-limit");
 
 require("dotenv").config();
 const path = require('path')
@@ -18,6 +20,16 @@ const authRoutes = require('./routes/auth')
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// Security Middlewares
+app.use(helmet());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -31,19 +43,23 @@ app.use(userRoutes)
 app.use(projectRoutes)
 app.use(authRoutes)
 
+app.use(errorController.get404);
+app.use((error, req, res, next) => {
+  console.error(error.stack);
+  res
+    .status(500)
+    .render("500", { pageTitle: "Error", errorMessage: error.message });
+});
+
 
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Database Connected");
+    app.listen(PORT, () => {
+      console.log(`Server listening on port: http://localhost:${PORT}/home`);
+    });
   })
   .catch((err) => {
-    console.log(`ERROR: ${err}`);
+    console.error(`ERROR: ${err}`);
   });
-
-app.use(errorController.get404);
-
-
-app.listen(PORT, () => {
-  console.log(`Server listening on port: http://localhost:${PORT}/home`);
-});
